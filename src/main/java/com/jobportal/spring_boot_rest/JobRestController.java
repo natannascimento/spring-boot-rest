@@ -42,4 +42,9 @@ public class JobRestController {
         service.deleteJob(postId);
         return "Job Deleted Successfully";
     }
+
+    public String loadData(){
+        service.load();
+        return "success";
+    }
 }
