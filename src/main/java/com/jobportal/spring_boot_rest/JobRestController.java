@@ -43,6 +43,7 @@ public class JobRestController {
         return "Job Deleted Successfully";
     }
 
+    @GetMapping("load")
     public String loadData(){
         service.load();
         return "success";
