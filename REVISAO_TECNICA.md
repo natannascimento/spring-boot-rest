@@ -16,35 +16,36 @@ Data da análise: 2026-03-31
 - Situação original (histórica): havia usuário/senha em texto puro no `application.properties`.
 - Situação atual: configuração externalizada por variáveis de ambiente (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`).
 
-### 2) Modelagem JPA incompleta para coleção (alto) — **resolvido**
+### 2) Modelagem JPA incompleta para coleção (alto)
 
-- Situação original (histórica): `JobPost` declarava `List<String> postTechStack` sem mapeamento JPA explícito.
-- Situação atual: coleção mapeada com `@ElementCollection`/`@CollectionTable` e versionamento de schema com Flyway (`V1__create_job_post_tables.sql`).
+- A entidade `JobPost` declara `List<String> postTechStack` sem anotação JPA apropriada (`@ElementCollection` + mapeamento).
+- Em JPA/Hibernate, `List<String>` simples não é persistida corretamente sem mapeamento explícito.
 
-### 3) API sem tratamento de erros e sem códigos HTTP adequados (alto) — **resolvido**
+### 3) API sem tratamento de erros e sem códigos HTTP adequados (alto)
 
-- Situação original (histórica): havia retorno de objeto vazio para não encontrado e resposta de sucesso sem validação de existência.
-- Situação atual: endpoints usam `ResponseEntity` com códigos HTTP corretos e tratamento global via `@RestControllerAdvice`.
+- `getJob` retorna `new JobPost()` quando não encontra registro, gerando semântica incorreta (deveria ser 404).
+- `deleteJob` sempre retorna sucesso sem verificar existência prévia.
+- Não há uso de `ResponseEntity`, nem camada de exceção global (`@ControllerAdvice`).
 
-### 4) Endpoint de escrita aceitando apenas XML (médio) — **resolvido**
+### 4) Endpoint de escrita aceitando apenas XML (médio)
 
-- Situação original (histórica): `jobPost` aceitava somente XML em escrita.
-- Situação atual: endpoints de escrita padronizados para JSON.
+- `@PostMapping` em `jobPost` define `consumes = "application/xml"`, enquanto o restante opera em JSON.
+- Esse comportamento é inconsistente e tende a quebrar integrações de clientes REST usuais.
 
 ### 5) CORS restrito a localhost fixo e sem externalização (médio)
 
 - `@CrossOrigin(origins = "http://localhost:3000")` hardcoded no controller.
 - Isso não escala para ambientes diferentes (homolog/prod) e dificulta governança de segurança.
 
-### 6) Endpoint de carga de dados sem proteção e não idempotente (médio) — **parcialmente resolvido**
+### 6) Endpoint de carga de dados sem proteção e não idempotente (médio)
 
-- Situação atual: endpoint de carga foi alterado para `POST /load`, corrigindo a semântica HTTP de escrita.
-- Pendente: ainda é necessário controlar acesso e idempotência para uso seguro em produção.
+- Endpoint `GET /load` grava dados no banco.
+- Viola semântica HTTP (GET não deve causar efeito colateral) e pode causar duplicidade/integridade inconsistente.
 
-### 7) Ausência de validação de entrada (alto) — **resolvido**
+### 7) Ausência de validação de entrada (alto)
 
-- Situação original (histórica): entidade/controlador não aplicavam Bean Validation.
-- Situação atual: validações com `jakarta.validation` e respostas de erro padronizadas para payload inválido.
+- DTO/entidade não usa Bean Validation (`@NotBlank`, `@Min`, etc.).
+- Controller não usa `@Valid`, permitindo payloads inválidos.
 
 ### 8) Testes insuficientes (alto)
 
@@ -65,8 +66,11 @@ Data da análise: 2026-03-31
 
 ## Próximos passos sugeridos (ordem recomendada)
 
-1. Revisar CORS/configuração externa por ambiente.
-2. Endurecer segurança/idempotência do endpoint `/load` (ou mover para processo de seed controlado).
-3. Fortalecer testes (unit + integração + contrato de API).
-4. Revisar alinhamento de versões/dependências com política do projeto.
+1. Ajustar modelagem JPA (`@ElementCollection`) e migrações (Flyway/Liquibase).
+2. Padronizar API HTTP (`ResponseEntity`, status corretos, tratamento global de exceções).
+3. Implementar validações (`javax/jakarta validation`) e mensagens de erro padronizadas.
+4. Revisar CORS/configuração externa por ambiente.
+5. Remover/refatorar endpoint `/load` (ou mover para processo de seed controlado).
+6. Fortalecer testes (unit + integração + contrato de API).
+7. Revisar alinhamento de versões/dependências com política do projeto.
 

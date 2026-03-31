@@ -2,9 +2,7 @@ package com.jobportal.spring_boot_rest;
 
 import com.jobportal.spring_boot_rest.model.JobPost;
 import com.jobportal.spring_boot_rest.service.JobService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,30 +20,24 @@ public class JobRestController {
         this.service = service;
     }
 
-    @GetMapping(path = "jobPosts", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "jobPosts", produces = "application/json")
     public ResponseEntity<List<JobPost>> getAllJobs() {
         return ResponseEntity.ok(service.getAllJobs());
     }
 
-    @GetMapping(path = "jobPost/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("jobPost/{postId}")
     public ResponseEntity<JobPost> getJob(@PathVariable("postId") int postId) {
         return ResponseEntity.ok(service.getJobOrThrow(postId));
     }
 
-    @PostMapping(path = "jobPost", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JobPost> addJob(@Valid @RequestBody JobPost jobPost) {
+    @PostMapping(path = "jobPost", consumes = "application/xml")
+    public ResponseEntity<JobPost> addJob(@RequestBody JobPost jobPost) {
         JobPost created = service.addJob(jobPost);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{postId}")
-                .buildAndExpand(created.getPostId())
-                .toUri();
-
-        return ResponseEntity.created(location).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping(path = "jobPost", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JobPost> updateJob(@Valid @RequestBody JobPost jobPost) {
+    @PutMapping("jobPost")
+    public ResponseEntity<JobPost> updateJob(@RequestBody JobPost jobPost) {
         return ResponseEntity.ok(service.updateJob(jobPost));
     }
 
@@ -55,13 +47,13 @@ public class JobRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("load")
+    @GetMapping("load")
     public ResponseEntity<String> loadData() {
         service.load();
-        return ResponseEntity.status(HttpStatus.CREATED).body("success");
+        return ResponseEntity.ok("success");
     }
 
-    @GetMapping(path = "jobPosts/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("jobPosts/keyword/{keyword}")
     public ResponseEntity<List<JobPost>> searchByKeyword(@PathVariable("keyword") String keyword) {
         return ResponseEntity.ok(service.search(keyword));
     }
