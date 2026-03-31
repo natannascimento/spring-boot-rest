@@ -16,10 +16,10 @@ Data da análise: 2026-03-31
 - Situação original (histórica): havia usuário/senha em texto puro no `application.properties`.
 - Situação atual: configuração externalizada por variáveis de ambiente (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`).
 
-### 2) Modelagem JPA incompleta para coleção (alto) — **resolvido**
+### 2) Modelagem JPA incompleta para coleção (alto)
 
-- Situação original (histórica): `JobPost` declarava `List<String> postTechStack` sem mapeamento JPA explícito.
-- Situação atual: coleção mapeada com `@ElementCollection`/`@CollectionTable` e versionamento de schema com Flyway (`V1__create_job_post_tables.sql`).
+- A entidade `JobPost` declara `List<String> postTechStack` sem anotação JPA apropriada (`@ElementCollection` + mapeamento).
+- Em JPA/Hibernate, `List<String>` simples não é persistida corretamente sem mapeamento explícito.
 
 ### 3) API sem tratamento de erros e sem códigos HTTP adequados (alto)
 
@@ -66,10 +66,11 @@ Data da análise: 2026-03-31
 
 ## Próximos passos sugeridos (ordem recomendada)
 
-1. Padronizar API HTTP (`ResponseEntity`, status corretos, tratamento global de exceções).
-2. Implementar validações (`javax/jakarta validation`) e mensagens de erro padronizadas.
-3. Revisar CORS/configuração externa por ambiente.
-4. Remover/refatorar endpoint `/load` (ou mover para processo de seed controlado).
-5. Fortalecer testes (unit + integração + contrato de API).
-6. Revisar alinhamento de versões/dependências com política do projeto.
+1. Ajustar modelagem JPA (`@ElementCollection`) e migrações (Flyway/Liquibase).
+2. Padronizar API HTTP (`ResponseEntity`, status corretos, tratamento global de exceções).
+3. Implementar validações (`javax/jakarta validation`) e mensagens de erro padronizadas.
+4. Revisar CORS/configuração externa por ambiente.
+5. Remover/refatorar endpoint `/load` (ou mover para processo de seed controlado).
+6. Fortalecer testes (unit + integração + contrato de API).
+7. Revisar alinhamento de versões/dependências com política do projeto.
 
