@@ -2,7 +2,8 @@ package com.jobportal.spring_boot_rest;
 
 import com.jobportal.spring_boot_rest.model.JobPost;
 import com.jobportal.spring_boot_rest.service.JobService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,46 +12,47 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class JobRestController {
 
-    @Autowired
-    private JobService service;
+    private final JobService service;
+
+    public JobRestController(JobService service) {
+        this.service = service;
+    }
 
     @GetMapping(path = "jobPosts", produces = "application/json")
-    //@ResponseBody
-    public List<JobPost> getAllJobs(){
-        return service.getAllJobs();
+    public ResponseEntity<List<JobPost>> getAllJobs() {
+        return ResponseEntity.ok(service.getAllJobs());
     }
 
     @GetMapping("jobPost/{postId}")
-    public JobPost getJob(@PathVariable("postId") int postId){
-        return service.getJob(postId);
+    public ResponseEntity<JobPost> getJob(@PathVariable("postId") int postId) {
+        return ResponseEntity.ok(service.getJobOrThrow(postId));
     }
 
     @PostMapping(path = "jobPost", consumes = "application/xml")
-    public JobPost addJob(@RequestBody JobPost jobPost){
-        service.addJob(jobPost);
-        return service.getJob(jobPost.getPostId());
+    public ResponseEntity<JobPost> addJob(@RequestBody JobPost jobPost) {
+        JobPost created = service.addJob(jobPost);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("jobPost")
-    public JobPost updateJob(@RequestBody JobPost jobPost){
-        service.updateJob(jobPost);
-        return service.getJob(jobPost.getPostId());
+    public ResponseEntity<JobPost> updateJob(@RequestBody JobPost jobPost) {
+        return ResponseEntity.ok(service.updateJob(jobPost));
     }
 
     @DeleteMapping("jobPost/{postId}")
-    public String deleteJob(@PathVariable("postId") int postId){
+    public ResponseEntity<Void> deleteJob(@PathVariable("postId") int postId) {
         service.deleteJob(postId);
-        return "Job Deleted Successfully";
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("load")
-    public String loadData(){
+    public ResponseEntity<String> loadData() {
         service.load();
-        return "success";
+        return ResponseEntity.ok("success");
     }
 
     @GetMapping("jobPosts/keyword/{keyword}")
-    public List<JobPost> searchByKeyword(@PathVariable("keyword") String keyword){
-        return service.search(keyword);
+    public ResponseEntity<List<JobPost>> searchByKeyword(@PathVariable("keyword") String keyword) {
+        return ResponseEntity.ok(service.search(keyword));
     }
 }
