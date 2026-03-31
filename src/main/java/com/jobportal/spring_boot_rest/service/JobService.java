@@ -1,8 +1,8 @@
 package com.jobportal.spring_boot_rest.service;
 
+import com.jobportal.spring_boot_rest.exception.ResourceNotFoundException;
 import com.jobportal.spring_boot_rest.model.JobPost;
 import com.jobportal.spring_boot_rest.repo.JobRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,26 +12,37 @@ import java.util.List;
 @Service
 public class JobService {
 
-    @Autowired
-    private JobRepo repo;
+    private final JobRepo repo;
 
-    public void addJob(JobPost jobPost){
-        repo.save(jobPost);
+    public JobService(JobRepo repo) {
+        this.repo = repo;
     }
 
-    public List<JobPost> getAllJobs(){
+    public JobPost addJob(JobPost jobPost) {
+        return repo.save(jobPost);
+    }
+
+    public List<JobPost> getAllJobs() {
         return repo.findAll();
     }
 
-    public JobPost getJob(int postId) {
-        return repo.findById(postId).orElse(new JobPost());
+    public JobPost getJobOrThrow(int postId) {
+        return repo.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job post not found for id " + postId));
     }
 
-    public void updateJob(JobPost jobPost) {
-        repo.save(jobPost);
+    public JobPost updateJob(JobPost jobPost) {
+        int postId = jobPost.getPostId();
+        if (!repo.existsById(postId)) {
+            throw new ResourceNotFoundException("Job post not found for id " + postId);
+        }
+        return repo.save(jobPost);
     }
 
     public void deleteJob(int postId) {
+        if (!repo.existsById(postId)) {
+            throw new ResourceNotFoundException("Job post not found for id " + postId);
+        }
         repo.deleteById(postId);
     }
 
@@ -62,6 +73,6 @@ public class JobService {
     }
 
     public List<JobPost> search(String keyword) {
-        return repo.findByPostProfileContainingOrPostDescContaining(keyword,keyword);
+        return repo.findByPostProfileContainingOrPostDescContaining(keyword, keyword);
     }
 }
