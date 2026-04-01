@@ -51,11 +51,11 @@ Data da análise: 2026-03-31
 - Situação anterior: havia apenas teste de contexto (`contextLoads`).
 - Situação atual: suíte expandida com testes unitários, testes de controller (contrato/validação) e integração com PostgreSQL real via Testcontainers, incluindo cenário de concorrência no seed.
 
-### 9) Dependências e versão de plataforma potencialmente inconsistentes (médio) — **parcialmente resolvido**
+### 9) Dependências e versão de plataforma potencialmente inconsistentes (médio) — **resolvido**
 
 - Situação atual: dependências alinhadas para os starters padrão (`spring-boot-starter-web` e `spring-boot-starter-test`).
 - Situação atual: removida versão fixa de `jackson-dataformat-xml`, deixando gerenciamento para o BOM do Spring Boot.
-- Pendente: validar oficialmente se o baseline do time permanece em `Spring Boot 4.0.0`.
+- Situação atual: baseline e política de upgrade formalizadas em `BASELINE_POLITICA.md` e reforçadas por enforcer no build.
 
 ### 10) Qualidade de código/manutenibilidade (médio)
 
@@ -65,5 +65,5 @@ Data da análise: 2026-03-31
 
 ## Próximos passos sugeridos (ordem recomendada)
 
-1. Confirmar baseline corporativo de versão do Spring Boot e política de upgrade.
+1. Manter governança contínua de upgrades conforme `BASELINE_POLITICA.md` (checklist + ADR para major).
 
