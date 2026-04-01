@@ -51,11 +51,11 @@ Data da análise: 2026-03-31
 - Situação anterior: havia apenas teste de contexto (`contextLoads`).
 - Situação atual: suíte expandida com testes unitários, testes de controller (contrato/validação) e integração com PostgreSQL real via Testcontainers, incluindo cenário de concorrência no seed.
 
-### 9) Dependências e versão de plataforma potencialmente inconsistentes (médio)
+### 9) Dependências e versão de plataforma potencialmente inconsistentes (médio) — **parcialmente resolvido**
 
-- Parent em `Spring Boot 4.0.0` (a validar conforme baseline do time).
-- Uso de `spring-boot-starter-webmvc` e `spring-boot-starter-webmvc-test` em vez dos starters convencionais (`spring-boot-starter-web` e `spring-boot-starter-test`) aumenta risco de incompatibilidade.
-- `jackson-dataformat-xml` com versão fixa pode conflitar com o BOM do Spring Boot.
+- Situação atual: dependências alinhadas para os starters padrão (`spring-boot-starter-web` e `spring-boot-starter-test`).
+- Situação atual: removida versão fixa de `jackson-dataformat-xml`, deixando gerenciamento para o BOM do Spring Boot.
+- Pendente: validar oficialmente se o baseline do time permanece em `Spring Boot 4.0.0`.
 
 ### 10) Qualidade de código/manutenibilidade (médio)
 
@@ -65,5 +65,5 @@ Data da análise: 2026-03-31
 
 ## Próximos passos sugeridos (ordem recomendada)
 
-1. Revisar alinhamento de versões/dependências com política do projeto.
+1. Confirmar baseline corporativo de versão do Spring Boot e política de upgrade.
 
