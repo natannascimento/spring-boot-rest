@@ -36,10 +36,10 @@ Data da análise: 2026-03-31
 - Situação original (histórica): CORS estava hardcoded no controller para `http://localhost:3000`.
 - Situação atual: CORS externalizado por ambiente via propriedade `app.cors.allowed-origins` (variável `CORS_ALLOWED_ORIGINS`).
 
-### 6) Endpoint de carga de dados sem proteção e não idempotente (médio) — **parcialmente resolvido**
+### 6) Endpoint de carga de dados sem proteção e não idempotente (médio) — **resolvido**
 
-- Situação atual: endpoint de carga foi alterado para `POST /load`, corrigindo a semântica HTTP de escrita.
-- Pendente: ainda é necessário controlar acesso e idempotência para uso seguro em produção.
+- Situação original (histórica): endpoint permitia carga sem controle e sujeito a reexecuções sem governança.
+- Situação atual: endpoint exige habilitação explícita por ambiente (`SEED_ENABLED`), permite proteção por token (`SEED_TOKEN`/`X-Seed-Token`) e executa carga idempotente.
 
 ### 7) Ausência de validação de entrada (alto) — **resolvido**
 
@@ -65,7 +65,6 @@ Data da análise: 2026-03-31
 
 ## Próximos passos sugeridos (ordem recomendada)
 
-1. Endurecer segurança/idempotência do endpoint `/load` (ou mover para processo de seed controlado).
-2. Fortalecer testes (unit + integração + contrato de API).
-3. Revisar alinhamento de versões/dependências com política do projeto.
+1. Fortalecer testes (unit + integração + contrato de API).
+2. Revisar alinhamento de versões/dependências com política do projeto.
 
