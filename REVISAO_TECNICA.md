@@ -46,10 +46,10 @@ Data da análise: 2026-03-31
 - Situação original (histórica): entidade/controlador não aplicavam Bean Validation.
 - Situação atual: validações com `jakarta.validation` e respostas de erro padronizadas para payload inválido.
 
-### 8) Testes insuficientes (alto)
+### 8) Testes insuficientes (alto) — **resolvido**
 
-- Há apenas teste de contexto (`contextLoads`), sem cobertura de controller/service/repository.
-- Não há testes de integração de endpoints, contrato HTTP, validação nem cenários de erro.
+- Situação anterior: havia apenas teste de contexto (`contextLoads`).
+- Situação atual: suíte expandida com testes unitários, testes de controller (contrato/validação) e integração com PostgreSQL real via Testcontainers, incluindo cenário de concorrência no seed.
 
 ### 9) Dependências e versão de plataforma potencialmente inconsistentes (médio)
 
@@ -65,6 +65,5 @@ Data da análise: 2026-03-31
 
 ## Próximos passos sugeridos (ordem recomendada)
 
-1. Fortalecer testes (unit + integração + contrato de API).
-2. Revisar alinhamento de versões/dependências com política do projeto.
+1. Revisar alinhamento de versões/dependências com política do projeto.
 
